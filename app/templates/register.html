@@ -1,0 +1,56 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Modal Search -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content rounded-0">
+      <div class="modal-header">
+        <h5 class="modal-title">Search by keyword</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body d-flex align-items-center">
+        <div class="input-group w-75 mx-auto">
+          <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1" />
+          <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="container-fluid page-header py-5">
+  <h1 class="text-center text-white display-6">Registration here</h1>
+  <ol class="breadcrumb justify-content-center mb-0">
+    {% comment %} <li class="breadcrumb-item"><a href="#">Home</a></li>
+    <li class="breadcrumb-item"><a href="#">Pages</a></li>
+    <li class="breadcrumb-item active text-white">Registration</li> {% endcomment %}
+  </ol>
+</div>
+
+<!-- Registration Form -->
+<div class="container-fluid contact py-5">
+  <div class="container py-5">
+    <div class="lgn_bg p-5 bg-light rounded">
+      <div class="col-lg-7 mx-auto">
+        <form action="{% url 'register' %}" method="POST">
+          {% csrf_token %}
+          <h4>{{ e_msg }}</h4>
+          <input type="text" class="lgn_bg form-control py-3 mb-4" placeholder="Enter Your Name" name="name" required />
+          <input type="email" class="lgn_bg form-control py-3 mb-4" placeholder="Enter Your Email" name="email" required />
+          <input type="password" class="lgn_bg form-control py-3 mb-4" placeholder="Enter Your Password" name="password" required />
+          <input type="password" class="lgn_bg form-control py-3 mb-4" placeholder="Confirm Your Password" name="c_password" required />
+          <center>
+          <button class="lgn_bg btn btn-primary w-50 py-3" type="submit">Register</button>
+          </center>
+          <div class="text-center mt-3">
+            <a href="{% url 'login' %}" style="font-size: 14px;">Login here</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

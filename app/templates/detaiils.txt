@@ -1,0 +1,356 @@
+login page
+def login(request):
+    # if 'email' in request.session:
+    #     return render(request,"index.html")
+    try:
+        if request.POST:
+            email=request.POST['email']
+            password=request.POST['password']
+            uid=User.objects.get(email=email)
+            if uid.email==email:
+                # request.session['email']=uid.email
+                if uid.password==password:
+                    return render(request,"index.html")
+
+                else:
+                    con={
+                        'emsg': "Invalid Password",
+                    }
+                    return render(request,"login.html",con)
+            else:
+                
+                return render(request,"login.html")
+        else:
+           
+            return render(request,"login.html")
+    except:
+        con={
+                'e_msg': "Enter Valid Email ID",
+                    }
+        return render(request,"login.html",con)
+
+
+#===============================================================
+
+
+
+        def confirm_password(request):
+        if request.method == 'POST':
+            email = request.POST.get('email')
+            otp = request.POST.get('otp')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            print(email, otp)
+            
+            try:
+                uid = User.objects.get(email=email)
+                
+                if str(uid.otp) == otp:
+                    print(otp)
+                    
+                    if new_password == confirm_password:
+                        uid.password = new_password
+                        uid.save()
+                        print("Password Successfully Changed")
+                        
+                        context = {
+                            'email': email,
+                            'uid': uid,
+                            'emsg': 'Login Password Changed Successfully'
+                        }
+                        return render(request, "index.html", context)
+                    else:
+                        print("Passwords do not match")
+                        context = {
+                            "email": email,
+                            'emsg': "Passwords do not match",
+                        }
+                        return render(request, "confirm_password.html", context)
+                else:
+                    print("Invalid OTP")
+                    context = {
+                        "email": email,
+                        'emsg': "Invalid OTP"
+                    }
+                    return render(request, "confirm_password.html", context)
+            
+            except:
+                print("User not found")
+                context = {
+                    "email": email,
+                    'emsg': "User not found",
+                }
+                return render(request, "confirm_password.html", context)
+        
+        return render(request, "confirm_password.html")
+    #===============================================================   
+    
+       
+    
+    #===============================================================    
+    def forget(request):
+        if request.POST:
+            email = request.POST.get('email')
+            if email:
+                otp=random.randint(1111,9999)
+                
+                try:
+                    otp_instance,created=User.objects.get_or_create(email=email)
+                    otp_instance.otp=otp
+                    otp_instance.save()
+                    send_mail("forget password",'your otp is : '+str(otp),'gohiljayb10@gmail.com',[email])
+                    con={"email":email}
+                    return render(request,"confirm_password.html",con)
+                except:
+                    return render(request,"forget.html")
+            else:
+                return render(request,"forget.html")
+        else:
+            return render(request,"forget.html")
+                    
+    
+    
+    
+                
+    #===============================================================
+    def register(request):
+        if request.POST:
+            name=request.POST['name']
+            email=request.POST['email']
+            password=request.POST['password']
+            c_password=request.POST['c_password']
+            
+            try:
+                uid=User.objects.get(email=email)
+                if uid.email==email:
+                    con={"e_msg":"This Email ID is Already Login Add Another Email"}
+                    return render(request,"register.html",con)
+            except:
+                if password==c_password:
+                    User.objects.create(name=name,email=email,password=password)
+                    return render(request,"login.html")
+                else:
+                    return render(request,"register.html")
+                
+        else:
+            return render(request,"register.html")
+        
+        
+        
+    def contact(request):
+        
+        if request.POST:
+            name=request.POST['name']
+                    
+            email=request.POST['email']  
+                  
+            message=request.POST['message']  
+            
+            Contact.objects.create(name=name,email=email,message=message) 
+        return render(request,"contact.html")        
+==============================================================
+SHOW PRODUCT IN SHOP PAGE 
+
+model.py
+-------  
+class main_category(models.Model):
+    name=models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name
+    
+class sub_category(models.Model):
+       main_category=models.ForeignKey(main_category,on_delete=models.CASCADE) 
+       name=models.CharField(max_length=50)
+       
+       def __str__(self) -> str:
+           return self.name
+
+        
+class product(models.Model):
+    main_category=models.ForeignKey(main_category,on_delete=models.CASCADE,blank=True,null=True)
+    sub_category=models.ForeignKey(sub_category,on_delete=models.CASCADE,blank=True,null=True)
+    price1=models.ForeignKey(price,on_delete=models.CASCADE,blank=True,null=True)
+    
+    img=models.ImageField(upload_to='media',blank=True,null=True)
+    
+    name=models.CharField(max_length=50)
+    price=models.IntegerField()
+    des=models.TextField(blank=True,null=True)
+    
+    
+    def __str__(self):
+        return self.name    
+
+
+def shop(request):
+    pp=product.objects.all().order_by("-id")
+    con={'pp':pp,
+        }
+    return render(request,"shop.html",con)
+
+
+
+shop.html
+--------
+{% for i in pp %}
+              <div class="col-md-6 col-lg-6 col-xl-4">
+                <div class="rounded position-relative fruite-item">
+                  <div class="fruite-img">
+                    <img src="{{ i.img.url }}" class="img-fluid w-100 rounded-top" alt="" style="height: 300px" />
+                  </div>
+                  <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
+                    style="top: 10px; left: 10px">
+                    Fruits
+                  </div>
+                  <div class="p-4 border border-secondary border-top-0 rounded-bottom" style="height: 200px;">
+                    <h4>{{i.name}}</h4>
+                    <h5>( 1 Kg )</h5>
+                    <div class="d-flex justify-content-between flex-lg-wrap">
+                      <p class="text-dark fs-5 fw-bold mb-0">
+                        &#8377;{{i.price}}
+                      </p>
+                      <br><br>
+
+
+                    </div>
+                    <div style="display: flex; gap:15px">
+                      <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"><i
+                          class="fa-regular fa-eye"></i>
+                      </a>
+                      <a href="#" class="btn border border-secondary rounded-pill px-3 text-primary"
+                        style="font-size: 15px;"><i class="fa fa-shopping-bag me-2 text-primary"></i>
+                        Add to cart</a>
+                    </div>
+                    <!-- <a href="#"><i class="fa-sharp fa-solid fa-eye">view</i></a> -->
+                    <br>
+
+
+                  </div>
+                </div>
+              </div>
+
+              {% endfor %}
+
+(for image show )<------
+projects urls.py
+-----------
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+================================================================
+SHOW PRICE
+-------------
+def shop(request):
+    pp=product.objects.all().order_by("-id")
+    piz=price.objects.all()
+    piz2=request.GET.get("piz2")
+    if piz2:
+        pp=product.objects.filter(price1=piz2)
+    else:
+        pp=product.objects.all().order_by("-id")
+        
+    con={'pp':pp,
+        'piz':piz,}
+    return render(request,"shop.html",con)
+
+
+shop.html
+--------
+    {% for i in piz %}
+    <a href="/shop?piz2={{i.id}}" style="color: brown;">  &#8377;  {{i.price1}}</a><br>
+    {% endfor %}
+              
+model.py
+-------
+ 
+class price(models.Model):
+    price1 = models.CharField(max_length=50)   
+
+
+class product(models.Model):
+    main_category=models.ForeignKey(main_category,on_delete=models.CASCADE,blank=True,null=True)
+    sub_category=models.ForeignKey(sub_category,on_delete=models.CASCADE,blank=True,null=True)
+    price1=models.ForeignKey(price,on_delete=models.CASCADE,blank=True,null=True)
+    
+    img=models.ImageField(upload_to='media',blank=True,null=True)
+    
+    name=models.CharField(max_length=50)
+    price=models.IntegerField()
+    des=models.TextField(blank=True,null=True)
+    
+    
+    def __str__(self):
+        return self.name    
+
+
+
+
+category SHOW
+--------------
+fruits show
+
+
+
+
+class category(models.Model):
+    name1=models.CharField(max_length=30)
+
+
+
+    class product(models.Model):
+    main_category=models.ForeignKey(main_category,on_delete=models.CASCADE,blank=True,null=True)
+    sub_category=models.ForeignKey(sub_category,on_delete=models.CASCADE,blank=True,null=True)
+    price1=models.ForeignKey(price,on_delete=models.CASCADE,blank=True,null=True)
+    name1=models.ForeignKey(category,on_delete=models.CASCADE,blank=True,null=True)
+    img=models.ImageField(upload_to='media',blank=True,null=True)
+    
+    name=models.CharField(max_length=50)
+    price=models.IntegerField()
+    des=models.TextField(blank=True,null=True)
+    
+    
+    def __str__(self):
+        return self.name   
+        
+        
+def shop(request):
+   
+    pp=product.objects.all().order_by("-id")
+
+    piz=price.objects.all()
+    piz2=request.GET.get("piz2")
+
+    cat=category.objects.all()
+    cat2=request.GET.get("cat2") 
+    
+    
+    
+    if piz2:
+        pp=product.objects.filter(price1=piz2)
+    elif cat2:
+        pp=product.objects.filter(name1=cat2)
+    else:
+        pp=product.objects.all().order_by("-id")
+        
+    con={'pp':pp,
+        'cat':cat,
+        'piz':piz,}
+    return render(request,"shop.html",con)
+
+shop.html
+--------
+<li>
+    {% for i in cat %}
+    <div class="d-flex justify-content-between fruite-name">
+     
+      <a href="/shop?cat2={{i.id}}"><i class="fas fa-apple-alt me-2"></i>{{i.name1}}</a>
+      <span>(3)</span>
+      
+    </div>
+    {% endfor %}
+  </li>
+ 

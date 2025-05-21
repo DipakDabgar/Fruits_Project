@@ -1,0 +1,230 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block content %}
+
+
+        <!-- Modal Search Start -->
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex align-items-center">
+                        <div class="input-group w-75 mx-auto d-flex">
+                            <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Search End -->
+
+
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6">Checkout</h1>
+            <ol class="breadcrumb justify-content-center mb-0">
+                {% comment %} <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                <li class="breadcrumb-item active text-white">Checkout</li> {% endcomment %}
+            </ol>
+        </div>
+        <!-- Single Page Header End -->
+
+
+        <!-- Checkout Page Start -->
+        <div class="container-fluid py-5">
+            <div class="container">
+                <h1 class="mb-4">Billing details</h1>
+                <form action="{% url 'billing_view' %}" method="POST">
+                    {% csrf_token %}
+                            
+
+                        <script src="https://checkout.razorpay.com/v1/checkout.js" data-key="rzp_test_bilBagOBVTi4lE"
+                        data-amount={{response.amount}} data-currency={{response.currency}} data-buttontext="Pay with Razorpay"
+                        data-name="{{request.user}}" data-theme.color="#F37254" data-description="" data-image=""
+                        data-prefill.name={{request.user.username}} data-prefill.email={{request.user.email}}>
+                        </script>
+
+                    <div class="row g-5">
+                        <div class="col-md-12 col-lg-6 col-xl-7">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-6">
+                                    <div class="form-item w-100">
+                                        <label class="form-label my-3">First Name<sup>*</sup></label>
+                                        <input type="text" name="f_name" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-lg-6">
+                                    <div class="form-item w-100">
+                                        <label class="form-label my-3">Last Name<sup>*</sup></label>
+                                        <input type="text" name="l_name" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Company Name<sup>*</sup></label>
+                                <input type="text" name="company_name" class="form-control">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Address <sup>*</sup></label>
+                                <input type="text" name="address" class="form-control" placeholder="House Number Street Name" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Town/City<sup>*</sup></label>
+                                <input type="text" name="city" class="form-control">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Country<sup>*</sup></label>
+                                <input type="text" name="country" class="form-control">
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Postcode/Zip<sup>*</sup></label>
+                                <input type="text" name="zip_code" class="form-control" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Mobile<sup>*</sup></label>
+                                <input type="tel" name="mobile" class="form-control" required>
+                            </div>
+                            <div class="form-item">
+                                <label class="form-label my-3">Email Address<sup>*</sup></label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-12 col-lg-6 col-xl-5">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style="width: 250px;">Products</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Total</th>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody>
+                                        {% for i in aid %}
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="d-flex align-items-center mt-2">
+                                                    <img src="{{i.img.url}}" class="img-fluid rounded-circle" style="width: 90px; height: 90px;" alt="">
+                                                </div>
+                                            </th>
+                                            <td class="py-5">{{i.name}}</td>
+                                            <td class="py-5">₹{{i.price}}</td>
+                                            <td class="py-5">{{i.quantity}}</td>
+                                            <td class="py-5">₹{{i.t_price}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        
+                                        <tr>
+                                            
+                                            <td>
+                                                <p>Shipping Charge</p></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                               <td> <p>₹50</p></td>
+                                           
+                               
+                                         
+                                          
+                                        </tr>
+                                    <tr>
+                                        <td >
+                                            <p >Discount Codes</p> </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                           <td> <p>₹{{discount}}</p></td>
+                                        </tr>
+
+                                           
+                                      
+                                            <!-- <th scope="row">
+                                            </th> -->
+                                            <tr>
+                                            <td >
+                                                <p class="text-dark text-uppercase" style="    margin-left:0px;">TOTAL</p>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                
+                                                    <p class=" text-dark">₹{{t_price}}</p>
+                                               
+                                            </td>
+
+                                        </tr>
+
+
+                                           
+                                      
+
+                                    
+                                    </tbody>
+                                    
+                                </table>
+                                <br/>
+                                <tr>
+                                    <td><button style="width: 430px;height:50px;background-color:#81C408;border:none;color:white;font-size:20px;font-weight:700;border-radius:10px">Place Order</button>
+                                    
+                                    
+                                    
+                                    
+                                    </td>
+                                </tr>
+
+                            </div>
+                           
+                            <!-- <div class="row g-4 text-center align-items-center justify-content-center pt-4" >
+                          
+                                <a href="#" onclick="document.getElementById('razorpayForm').submit();" class="w-100">
+                                    <div id="razorpayForm" style="background-color: red;" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary" style="width: 650px;">
+                                        <script src="https://checkout.razorpay.com/v1/checkout.js" 
+                                                data-key="rzp_test_bilBagOBVTi4lE"
+                                                data-amount="{{response.amount}}"
+                                                data-currency="{{response.currency}}"
+                                                data-buttontext="Place Order"
+                                                data-name="{{request.user}}"
+                                                data-theme.color="#F37254"
+                                                data-description=""
+                                                data-image=""
+                                                data-prefill.name="{{request.user.username}}"
+                                                data-prefill.email="{{request.user.email}}">
+                                        </script>
+                                    </div>
+                                </a>
+                                
+
+
+
+                            </div> -->
+                            
+                        </div>
+
+
+
+
+
+
+                        
+                        
+                    </div>
+               
+                </form>
+            </div>
+        </div>
+
+        <!-- Checkout Page End -->
+
+{% endblock %}
